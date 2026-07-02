@@ -143,7 +143,7 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
           <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full border-4 border-blue-500/20 flex items-center justify-center mb-6">
             
             {/* Outer rotating decorative ring */}
-            <div className={`absolute inset-0 rounded-full border-t-4 border-blue-500 transition-all duration-500 ${
+            <div className={`absolute inset-0 rounded-full border-t-4 border-blue-500 pointer-events-none transition-all duration-500 ${
               scanState === "scanning" || scanState === "repairing"
                 ? "animate-spin border-blue-400"
                 : scanState === "scanned" && activeFindings.length > 0
@@ -154,20 +154,38 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
             }`} style={{ animationDuration: scanState === "scanning" || scanState === "repairing" ? "1.5s" : "12s" }} />
 
             {/* Core Circle Container */}
-            <div className={`w-44 h-44 sm:w-52 sm:h-52 rounded-full flex flex-col items-center justify-center p-6 transition-all duration-300 ${
-              scanState === "ready"
-                ? "bg-blue-600 hover:bg-blue-500 shadow-[0_0_50px_rgba(37,99,235,0.3)] cursor-pointer group"
-                : scanState === "scanning" || scanState === "repairing"
-                ? "bg-[#16181d] border-2 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]"
-                : scanState === "scanned"
-                ? "bg-[#16181d] border-2 border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.2)]"
-                : "bg-[#16181d] border-2 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]"
-            }`}
-            onClick={scanState === "ready" ? handleStartScan : undefined}
+            <button
+              type="button"
+              className={`relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full flex flex-col items-center justify-center p-6 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/30 ${
+                scanState === "ready"
+                  ? "bg-blue-600 hover:bg-blue-500 shadow-[0_0_50px_rgba(37,99,235,0.4)] cursor-pointer group transform hover:scale-105"
+                  : scanState === "scanning" || scanState === "repairing"
+                  ? "bg-[#16181d] border-2 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)] cursor-default"
+                  : scanState === "scanned"
+                  ? "bg-[#16181d] border-2 border-yellow-500 hover:border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.2)] cursor-pointer group transform hover:scale-105"
+                  : "bg-[#16181d] border-2 border-emerald-500 hover:border-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.2)] cursor-pointer group transform hover:scale-105"
+              }`}
+              onClick={() => {
+                if (scanState === "ready") handleStartScan();
+                else if (scanState === "scanned") handleRepairAll();
+                else if (scanState === "repaired") {
+                  sound.playClick();
+                  setScanState("ready");
+                }
+              }}
+              title={
+                scanState === "ready"
+                  ? "Click to start system scan"
+                  : scanState === "scanned"
+                  ? "Click to 1-Click Repair All issues"
+                  : scanState === "repaired"
+                  ? "Click to scan again"
+                  : "Scan in progress..."
+              }
             >
               {scanState === "ready" && (
                 <>
-                  <span className="text-white text-3xl sm:text-4xl font-black tracking-tighter group-hover:scale-105 transition-transform">SCAN</span>
+                  <span className="text-white text-3xl sm:text-4xl font-black tracking-tighter group-hover:scale-110 transition-transform">SCAN</span>
                   <span className="text-blue-200 text-[10px] font-bold tracking-widest mt-1 uppercase">OPTIMIZE ALL</span>
                 </>
               )}
@@ -185,7 +203,7 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
               {scanState === "scanned" && (
                 <>
                   <AlertTriangle className="w-10 h-10 text-yellow-400 mb-1 animate-pulse" />
-                  <span className="text-3xl sm:text-4xl font-extrabold text-yellow-400 font-mono">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-yellow-400 font-mono group-hover:scale-110 transition-transform">
                     {activeFindings.length}
                   </span>
                   <span className="text-[11px] font-bold text-white uppercase tracking-wider mt-1">
@@ -199,7 +217,7 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
 
               {scanState === "repaired" && (
                 <>
-                  <CheckCircle2 className="w-10 h-10 text-emerald-400 mb-1" />
+                  <CheckCircle2 className="w-10 h-10 text-emerald-400 mb-1 group-hover:scale-110 transition-transform" />
                   <span className="text-xl font-bold text-emerald-400 uppercase">SECURED</span>
                   <span className="text-[11px] text-slate-300 mt-1">All {repairedCount} fixed</span>
                   <span className="text-[9px] font-mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded mt-1.5 font-bold">
@@ -207,7 +225,7 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
                   </span>
                 </>
               )}
-            </div>
+            </button>
           </div>
 
           <p className="text-slate-400 text-sm text-center max-w-md">
@@ -217,9 +235,21 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
 
           {/* ACTION BUTTONS WHEN SCANNED OR REPAIRED */}
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
+            {scanState === "ready" && (
+              <button
+                type="button"
+                onClick={handleStartScan}
+                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:shadow-[0_0_40px_rgba(37,99,235,0.6)] transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5 cursor-pointer uppercase tracking-wider"
+              >
+                <Play className="w-5 h-5 fill-white" />
+                <span>START SMART SYSTEM SCAN</span>
+              </button>
+            )}
+
             {scanState === "scanned" && (
               <>
                 <button
+                  type="button"
                   onClick={handleRepairAll}
                   className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-[0_0_30px_rgba(37,99,235,0.3)] transition-all flex items-center justify-center space-x-2 cursor-pointer uppercase tracking-wider"
                 >
@@ -228,6 +258,7 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
                 </button>
 
                 <button
+                  type="button"
                   onClick={onTriggerTurbo}
                   className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 transition-all flex items-center justify-center space-x-2"
                 >
@@ -239,6 +270,7 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
 
             {scanState === "repaired" && (
               <button
+                type="button"
                 onClick={() => {
                   sound.playClick();
                   setScanState("ready");
