@@ -61,6 +61,18 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
     }
   ];
 
+  const safeParseJSON = async (res: Response) => {
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const text = await res.text();
+      if (text.includes("The page could not be found") || text.includes("<title>") || res.status === 404 || res.status >= 500) {
+        throw new Error(`AI Backend service was rebooting or offline (HTTP ${res.status}). Please click try again in a moment!`);
+      }
+      throw new Error(`Server returned unexpected response (HTTP ${res.status}). Please try again.`);
+    }
+    return await res.json();
+  };
+
   const handleRunAiDiagnosis = async () => {
     sound.playClick();
     setLoadingDiag(true);
@@ -76,7 +88,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
           osType: telemetry ? telemetry.platform : "Windows 11 / x64"
         })
       });
-      const data = await res.json();
+      const data = await safeParseJSON(res);
       if (res.ok) {
         setDiagReport(data);
         sound.playRepairSuccess();
@@ -84,7 +96,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
         alert("AI Diagnosis failed: " + (data.error || "Unknown error"));
       }
     } catch (e: any) {
-      alert("Network error calling AI Doctor: " + e.message);
+      alert("AI Doctor notification: " + e.message);
     } finally {
       setLoadingDiag(false);
     }
@@ -109,7 +121,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
           systemSpec: telemetry ? `${telemetry.platform}, ${telemetry.hardwareConcurrency} Cores, ${telemetry.gpuRenderer}` : "PC System"
         })
       });
-      const data = await res.json();
+      const data = await safeParseJSON(res);
       if (res.ok) {
         setLogResult(data);
         sound.playRepairSuccess();
@@ -117,7 +129,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
         alert("Log analysis failed: " + (data.error || "Unknown error"));
       }
     } catch (e: any) {
-      alert("Network error: " + e.message);
+      alert("AI Doctor notification: " + e.message);
     } finally {
       setLoadingLog(false);
     }
@@ -143,7 +155,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
           targetOS: telemetry ? telemetry.platform : "Windows PowerShell"
         })
       });
-      const data = await res.json();
+      const data = await safeParseJSON(res);
       if (res.ok) {
         setScriptResult(data);
         sound.playRepairSuccess();
@@ -151,7 +163,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
         alert("Script generation failed: " + (data.error || "Unknown error"));
       }
     } catch (e: any) {
-      alert("Network error: " + e.message);
+      alert("AI Doctor notification: " + e.message);
     } finally {
       setLoadingScript(false);
     }
@@ -604,7 +616,7 @@ SYMPTOM: Screen goes black for 2 seconds while rendering Unreal Engine scene, th
                 <div className="bg-gray-900 px-4 py-3 border-b border-gray-800 flex items-center justify-between">
                   <span className="text-xs font-mono text-emerald-300 font-bold flex items-center space-x-2">
                     <Terminal className="w-4 h-4 text-emerald-400" />
-                    <span>PulseWASM_AutoRepair.{scriptResult.language === "PowerShell" ? "ps1" : "sh"}</span>
+                    <span>PCSecure_AutoRepair.{scriptResult.language === "PowerShell" ? "ps1" : "sh"}</span>
                   </span>
                   <button
                     onClick={() => copyCode(scriptResult.scriptCode)}

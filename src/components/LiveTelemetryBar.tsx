@@ -7,15 +7,6 @@ interface LiveTelemetryBarProps {
   turboActive: boolean;
 }
 
-import React from "react";
-import { Cpu, HardDrive, Wifi, BatteryCharging, Zap, Activity, ShieldCheck, Thermometer } from "lucide-react";
-import { SystemTelemetry } from "../types";
-
-interface LiveTelemetryBarProps {
-  telemetry: SystemTelemetry | null;
-  turboActive: boolean;
-}
-
 interface MetricTooltipProps {
   title: string;
   metric: string;

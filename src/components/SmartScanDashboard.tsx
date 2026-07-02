@@ -3,6 +3,7 @@ import { Shield, Zap, CheckCircle2, AlertTriangle, Play, RefreshCw, Trash2, Lock
 import confetti from "canvas-confetti";
 import { ScanFinding, ScanCategory, SystemTelemetry } from "../types";
 import { sound } from "../lib/soundFx";
+import pcSecureLogo from "../assets/images/pc_secure_logo_1783009068614.jpg";
 
 interface SmartScanDashboardProps {
   findings: ScanFinding[];
@@ -42,11 +43,11 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
     setScanProgress(0);
 
     const steps = [
-      { progress: 15, label: "Probing Windows Registry & OS System Integrity..." },
-      { progress: 35, label: "Analyzing RAM Pagefile & CPU Throttling Bottlenecks..." },
-      { progress: 55, label: "Scanning Browser Tracking Cookies & DNS Prefetch..." },
-      { progress: 80, label: "Calculating System Junk & Stale Crash Dumps..." },
-      { progress: 100, label: "Evaluating Startup Impact & Background Bloat..." }
+      { progress: 15, label: "Scanning Temp Files (%TEMP%), Windows Prefetch Cache & Error Dumps (.dmp)..." },
+      { progress: 35, label: "Running CleanMgr Simulation & Purging Windows Update Staging Cache..." },
+      { progress: 55, label: "Deep Scanning for Viruses, Spyware, Adware & Browser Popup Hijackers..." },
+      { progress: 80, label: "Auditing Unused Browser Extensions (Chrome/Edge/Firefox) & Cookies..." },
+      { progress: 100, label: "Analyzing & Disabling Non-Essential High-Impact Startup Items..." }
     ];
 
     let currentStepIdx = 0;
@@ -139,6 +140,24 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
         
         <div className="relative z-10 flex flex-col items-center justify-center text-center w-full max-w-2xl py-4">
           
+          {/* BRAND HERO LOGO BANNER */}
+          <div className="flex items-center justify-center gap-3 mb-6 bg-white/[0.03] px-5 py-2 rounded-full border border-white/5 shadow-lg backdrop-blur-md">
+            <img
+              src={pcSecureLogo}
+              alt="PCSecure Logo"
+              className="w-7 h-7 rounded-lg object-cover border border-blue-500/30 shadow-sm"
+              referrerPolicy="no-referrer"
+            />
+            <div className="text-left leading-none">
+              <span className="text-white font-extrabold text-base tracking-tight">
+                PC<span className="text-blue-500 font-black">Secure</span>
+              </span>
+              <span className="text-[8px] font-mono font-bold tracking-[0.2em] text-blue-400/80 uppercase block mt-0.5">
+                — SYSTEM CARE —
+              </span>
+            </div>
+          </div>
+
           {/* THE BENTO CIRCLE GAUGE / BUTTON */}
           <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full border-4 border-blue-500/20 flex items-center justify-center mb-6">
             

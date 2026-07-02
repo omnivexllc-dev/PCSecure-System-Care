@@ -219,89 +219,99 @@ export function generateDiagnosticFindings(os: string): ScanFinding[] {
     {
       id: "priv_1",
       category: "privacy_security",
-      title: "Invasive Browser Tracking Cookies & Ad Profilers",
-      description: "Detected 142 persistent tracking cookies across Chrome, Edge, and Firefox profiles monitoring web activity.",
-      severity: "HIGH",
-      impact: "Protects online anonymity & stops cross-site ad retargeting",
+      title: "Virus, Spyware & Adware Malware Detection",
+      description: "Detected 3 active Adware/PUP background trackers and potential spyware heuristics monitoring system behavior and injecting unwanted ads.",
+      severity: "CRITICAL",
+      impact: "Eliminates active spyware/adware threats & secures system memory",
       status: "unscanned",
-      repairAction: "Shred 142 tracking cookies & purge local supercookie storage"
+      repairAction: "Quarantine detected adware/spyware processes & neutralize adware registry keys"
     },
     {
       id: "priv_2",
       category: "privacy_security",
-      title: isWin ? "Windows Telemetry & Diagnostic Data Collection Active" : "Host Analytics & Crash Reporting Enabled",
-      description: "Background diagnostic service is uploading system usage statistics and app usage logs to cloud servers.",
-      severity: "MEDIUM",
-      impact: "Stops background bandwidth consumption & preserves personal privacy",
+      title: "Browser Popup Hijackers & Malicious Redirects",
+      description: "Unauthorized web notification permissions in Chrome/Edge triggering intrusive popups, fake system warnings, and browser redirects.",
+      severity: "HIGH",
+      impact: "Stops intrusive popup advertisements & secures browser routing",
       status: "unscanned",
-      repairAction: "Disable DiagTrack / Telemetry service & block tracking IP endpoints in hosts file"
+      repairAction: "Revoke malicious popup notification permissions & reset browser notification policies"
     },
     {
       id: "priv_3",
       category: "privacy_security",
-      title: "Unencrypted DNS Queries & Exposed Local Ports",
-      description: "DNS prefetch cache contains unencrypted query logs; UPnP broadcast port is responding to local network pings.",
+      title: "Unused & Dormant Browser Extensions (Chrome / Edge / Firefox)",
+      description: "Found 5 unused or dormant browser extensions consuming background memory and holding invasive page read/write permissions.",
       severity: "MEDIUM",
-      impact: "Secures DNS requests against eavesdropping & hardens network firewall",
+      impact: "Reclaims 320 MB RAM & prevents unauthorized browser DOM scraping",
       status: "unscanned",
-      repairAction: "Flush DNS resolver cache & enable strict port cloaking rules"
+      repairAction: "Disable unused browser extensions & strip unnecessary background script permissions"
+    },
+    {
+      id: "priv_4",
+      category: "privacy_security",
+      title: "Invasive Tracking Cookies & Windows Telemetry",
+      description: "Detected 142 persistent tracking cookies across browser profiles and active diagnostic telemetry uploading system usage statistics.",
+      severity: "MEDIUM",
+      impact: "Protects online anonymity & stops background telemetry bandwidth consumption",
+      status: "unscanned",
+      repairAction: "Shred tracking cookies & block diagnostic telemetry IP endpoints in hosts file"
     },
 
     // 4. Junk Cleaner
     {
       id: "junk_1",
       category: "junk_cleaner",
-      title: "System Temporary Files & App Crash Dumps",
-      description: "Accumulated Windows error reports (.dmp), installer leftovers, and temp directory bloat.",
+      title: "System Temp Files, Prefetch Folder & Error Logs (.dmp)",
+      description: "Accumulated Windows error dump reports (.dmp), Windows Prefetch cache (C:\\Windows\\Prefetch), and temporary folder bloat (%TEMP%).",
       severity: "HIGH",
-      impact: "Frees up ~2.8 GB of fast SSD storage",
+      impact: "Frees up ~3.2 GB of fast SSD storage & removes stale crash dumps",
       status: "unscanned",
-      repairAction: "Shred system temp directories (%TEMP%, /tmp) & delete old memory crash dumps",
-      sizeBytes: 2850000000
+      repairAction: "Purge system temp directories, clear Prefetch folder cache, & delete old memory crash dumps",
+      sizeBytes: 3200000000
     },
     {
       id: "junk_2",
       category: "junk_cleaner",
-      title: "Web Browser Cache & Media Buffer Leftovers",
-      description: "Old cached images, script bundles, and streaming video buffer files taking up excessive disk space.",
+      title: "Windows CleanMgr & System Update Cache Bloat",
+      description: "Stale update package installation files (.cab / .msi) left in system staging directories and Windows Disk Cleanup (CleanMgr) backlog.",
       severity: "MEDIUM",
-      impact: "Frees up ~1.4 GB & speeds up browser launch time",
+      impact: "Reclaims ~1.8 GB system drive space & resolves update staging bloat",
       status: "unscanned",
-      repairAction: "Clean stale HTTP cache across all browser profiles",
-      sizeBytes: 1420000000
+      repairAction: "Execute Automated CleanMgr simulation & purge SoftwareDistribution download staging folder",
+      sizeBytes: 1800000000
     },
     {
       id: "junk_3",
       category: "junk_cleaner",
-      title: "Recycle Bin & Broken Desktop Shortcuts",
-      description: "Unemptied recycle bin contents and 12 broken shortcuts pointing to non-existent drives.",
+      title: "Web Browser Cache & Media Buffer Leftovers",
+      description: "Old cached images, script bundles, and streaming video buffer files taking up excessive disk space.",
       severity: "LOW",
-      impact: "Frees up ~640 MB & cleans up system navigation",
+      impact: "Frees up ~1.1 GB & speeds up browser launch time",
       status: "unscanned",
-      repairAction: "Empty system Recycle Bin & remove orphaned file shortcuts",
-      sizeBytes: 640000000
+      repairAction: "Clean stale HTTP cache across all browser profiles",
+      sizeBytes: 1100000000
     },
 
     // 5. Startup & Background Bloat
     {
       id: "start_1",
       category: "registry_startup",
-      title: "High-Impact Startup Background Updaters",
-      description: "7 non-essential background updaters (Game Launchers, Cloud Sync helpers, Hardware helper tools) launching at boot.",
+      title: "High-Impact Startup Items Not Required on Computer",
+      description: "8 non-essential background updaters (Game Launchers, Cloud Sync helpers, Hardware helper tools) launching at boot without user requirement.",
       severity: "CRITICAL",
-      impact: "Reduces boot time by ~4.5 seconds & saves 420 MB idle RAM",
+      impact: "Reduces boot time by ~4.8 seconds & saves 480 MB idle RAM",
       status: "unscanned",
-      repairAction: "Delay or disable non-essential startup items in Task Scheduler / Startup folder"
+      repairAction: "Disable non-essential startup items in Task Scheduler & Startup registry run keys"
     },
     {
       id: "start_2",
       category: "registry_startup",
-      title: "Idle Windows Superfetch / SysMain Indexing Overhead",
-      description: "SysMain service is continuously reading disk blocks in the background to pre-load unused applications.",
+      title: "Unrequired Background Services & SysMain Indexing Overhead",
+      description: "Unneeded background helper services and SysMain disk indexing continuously reading SSD blocks and consuming CPU cycles.",
       severity: "MEDIUM",
       impact: "Reduces SSD read wear & eliminates random background CPU spikes",
       status: "unscanned",
-      repairAction: "Optimize SysMain caching algorithm for NVMe/SSD drives"
+      repairAction: "Set unrequired background services to Manual & optimize SysMain caching algorithm for NVMe/SSD"
     }
   ];
 }

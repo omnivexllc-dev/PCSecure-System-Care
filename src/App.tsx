@@ -154,7 +154,7 @@ export default function App() {
           <div className="flex items-center space-x-4">
             <span>AI Root-Cause: <span className="text-blue-400 font-semibold">Gemini 3.5 Flash</span></span>
             <span>•</span>
-            <span>© 2026 SYSTEMCARE WASM CORE</span>
+            <span>© 2026 PCSECURE — SYSTEM CARE CORE</span>
           </div>
         </div>
       </footer>

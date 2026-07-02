@@ -1,6 +1,7 @@
 import React from "react";
 import { Shield, Zap, Cpu, Activity, Stethoscope, Volume2, VolumeX, Sparkles, Terminal } from "lucide-react";
 import { sound } from "../lib/soundFx";
+import pcSecureLogo from "../assets/images/pc_secure_logo_1783009068614.jpg";
 
 interface NavbarProps {
   activeTab: string;
@@ -33,21 +34,28 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-16">
           
           {/* Logo & Branding */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("scan")}>
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center shadow-lg shadow-blue-900/20 shrink-0">
-              <Shield className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab("scan")}>
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-[#0c192c] border border-blue-500/30 shadow-[0_0_15px_rgba(30,136,229,0.3)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300">
+              <img
+                src={pcSecureLogo}
+                alt="PCSecure System Care Logo"
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-white font-bold text-lg leading-tight uppercase tracking-wider">
-                  PulseWASM
+                <h1 className="text-white font-extrabold text-lg leading-tight tracking-tight flex items-center">
+                  <span>PC</span>
+                  <span className="text-blue-500 font-black">Secure</span>
                 </h1>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold border border-blue-500/30">
                   v4.02.1
                 </span>
               </div>
-              <p className="text-[10px] text-blue-500 font-mono tracking-widest leading-none mt-0.5">
-                SANDBOXED SYSTEM INTERFACE • {hostOS.toUpperCase()}
+              <p className="text-[9px] text-blue-400 font-mono font-bold tracking-[0.18em] leading-none mt-0.5 uppercase flex items-center gap-1.5">
+                <span>— SYSTEM CARE —</span>
+                <span className="text-slate-600 font-normal">• {hostOS.toUpperCase()}</span>
               </p>
             </div>
           </div>
