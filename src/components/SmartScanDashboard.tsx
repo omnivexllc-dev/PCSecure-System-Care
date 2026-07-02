@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Shield, Zap, CheckCircle2, AlertTriangle, Play, RefreshCw, Trash2, Lock, Cpu, Stethoscope, ChevronDown, ChevronUp, Sparkles, HardDrive, Check, X, ArrowRight, History, BarChart2, TrendingUp, Clock, Award, ShieldAlert, CheckCircle, Calendar, RotateCcw, FileText, ArrowUpRight } from "lucide-react";
 import confetti from "canvas-confetti";
-import { ScanFinding, ScanCategory, SystemTelemetry, ScanHistoryItem } from "../types";
+import { ScanFinding, ScanCategory, SystemTelemetry, ScanHistoryItem, UserAccount } from "../types";
 import { sound } from "../lib/soundFx";
 import pcSecureLogo from "../assets/images/pc_secure_logo_1783009068614.jpg";
 
@@ -11,6 +11,9 @@ interface SmartScanDashboardProps {
   telemetry: SystemTelemetry | null;
   onJumpToAi: () => void;
   onTriggerTurbo: () => void;
+  user?: UserAccount | null;
+  onRequireAuth?: () => void;
+  onRequireSubscription?: (onSuccessCallback: () => void) => void;
 }
 
 export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
@@ -18,7 +21,10 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
   setFindings,
   telemetry,
   onJumpToAi,
-  onTriggerTurbo
+  onTriggerTurbo,
+  user,
+  onRequireAuth,
+  onRequireSubscription
 }) => {
   const [scanState, setScanState] = useState<"ready" | "scanning" | "scanned" | "repairing" | "repaired">("ready");
   const [scanProgress, setScanProgress] = useState(0);
@@ -100,6 +106,24 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
   // Trigger 1-Click Repair All
   const handleRepairAll = () => {
     sound.playClick();
+    if (!user || !user.isLoggedIn) {
+      if (onRequireAuth) {
+        onRequireAuth();
+        return;
+      }
+    }
+    if (!user.isSubscribed) {
+      if (onRequireSubscription) {
+        onRequireSubscription(() => {
+          executeRepairAll();
+        });
+        return;
+      }
+    }
+    executeRepairAll();
+  };
+
+  const executeRepairAll = () => {
     setScanState("repairing");
     setScanProgress(0);
 
@@ -163,6 +187,24 @@ export const SmartScanDashboard: React.FC<SmartScanDashboardProps> = ({
   // Fix individual finding
   const handleFixSingle = (id: string) => {
     sound.playClick();
+    if (!user || !user.isLoggedIn) {
+      if (onRequireAuth) {
+        onRequireAuth();
+        return;
+      }
+    }
+    if (!user.isSubscribed) {
+      if (onRequireSubscription) {
+        onRequireSubscription(() => {
+          executeFixSingle(id);
+        });
+        return;
+      }
+    }
+    executeFixSingle(id);
+  };
+
+  const executeFixSingle = (id: string) => {
     setFindings(prev => prev.map(f => f.id === id ? { ...f, status: "repairing" } : f));
     setTimeout(() => {
       setFindings(prev => prev.map(f => f.id === id ? { ...f, status: "repaired" } : f));

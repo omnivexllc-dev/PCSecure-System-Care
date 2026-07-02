@@ -11,11 +11,15 @@ import { TurboBoostTab } from "./components/TurboBoostTab";
 import { WasmHardwareLab } from "./components/WasmHardwareLab";
 import { ProcessMonitorTab } from "./components/ProcessMonitorTab";
 import { AiSystemDoctorTab } from "./components/AiSystemDoctorTab";
+import { LandingPage } from "./components/LandingPage";
+import { AuthModal } from "./components/AuthModal";
+import { SubscriptionModal } from "./components/SubscriptionModal";
 import { 
   SystemTelemetry, 
   ScanFinding, 
   ProcessItem, 
-  StartupItem 
+  StartupItem,
+  UserAccount
 } from "./types";
 import { 
   probeSystemTelemetry, 
@@ -27,10 +31,24 @@ import {
 import { sound } from "./lib/soundFx";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>("scan");
+  const [activeTab, setActiveTab] = useState<string>("landing");
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [turboActive, setTurboActive] = useState<boolean>(false);
   const [hostOS] = useState<string>(detectHostOS());
+
+  // User Account & Subscription state
+  const [user, setUser] = useState<UserAccount | null>(() => {
+    const saved = localStorage.getItem("pcsecure_user_account");
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return null;
+  });
+
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("register");
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+  const [pendingRepairCallback, setPendingRepairCallback] = useState<(() => void) | null>(null);
 
   // Core data states
   const [telemetry, setTelemetry] = useState<SystemTelemetry | null>(null);
@@ -40,7 +58,6 @@ export default function App() {
 
   // Initialize telemetry and findings on mount
   useEffect(() => {
-    // Initial data load
     const initData = async () => {
       const tel = await probeSystemTelemetry();
       setTelemetry(tel);
@@ -50,12 +67,10 @@ export default function App() {
     };
     initData();
 
-    // Periodic telemetry probe
     const interval = setInterval(async () => {
       const updatedTel = await probeSystemTelemetry();
       setTelemetry(prev => {
         if (!prev) return updatedTel;
-        // Keep some continuity
         return {
           ...updatedTel,
           cpuUsage: turboActive 
@@ -71,6 +86,18 @@ export default function App() {
     return () => clearInterval(interval);
   }, [turboActive]);
 
+  const handleOpenAuth = (mode: "login" | "register") => {
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
+
+  const handleLogout = () => {
+    sound.playClick();
+    localStorage.removeItem("pcsecure_user_account");
+    setUser(null);
+    setActiveTab("landing");
+  };
+
   return (
     <div className="min-h-screen bg-[#0c0d0f] text-slate-400 font-sans antialiased selection:bg-blue-600 selection:text-white flex flex-col">
       
@@ -82,17 +109,31 @@ export default function App() {
         setSoundEnabled={setSoundEnabled}
         turboActive={turboActive}
         hostOS={hostOS}
+        user={user}
+        onOpenAuth={handleOpenAuth}
+        onOpenSubscription={() => setSubscriptionModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* 2. LIVE SYSTEM TELEMETRY HEADER */}
-      <LiveTelemetryBar
-        telemetry={telemetry}
-        turboActive={turboActive}
-      />
+      {activeTab !== "landing" && (
+        <LiveTelemetryBar
+          telemetry={telemetry}
+          turboActive={turboActive}
+        />
+      )}
 
-      {/* 3. MAIN DASHBOARD CONTENT AREA */}
+      {/* 3. MAIN CONTENT AREA */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex-grow">
         
+        {activeTab === "landing" && (
+          <LandingPage
+            onOpenAuth={handleOpenAuth}
+            onGoToDashboard={() => setActiveTab("scan")}
+            isLoggedIn={!!(user && user.isLoggedIn)}
+          />
+        )}
+
         {activeTab === "scan" && (
           <SmartScanDashboard
             findings={findings}
@@ -105,6 +146,12 @@ export default function App() {
             onTriggerTurbo={() => {
               setTurboActive(true);
               sound.playTurboBoost();
+            }}
+            user={user}
+            onRequireAuth={() => handleOpenAuth("register")}
+            onRequireSubscription={(onSuccess) => {
+              setPendingRepairCallback(() => onSuccess);
+              setSubscriptionModalOpen(true);
             }}
           />
         )}
@@ -142,7 +189,35 @@ export default function App() {
 
       </main>
 
-      {/* 4. BENTO GRID FOOTER RAIL */}
+      {/* 4. MODALS */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode={authMode}
+        onSuccess={(loggedUser) => {
+          setUser(loggedUser);
+          if (activeTab === "landing") {
+            setActiveTab("scan");
+          }
+        }}
+      />
+
+      <SubscriptionModal
+        isOpen={subscriptionModalOpen}
+        onClose={() => setSubscriptionModalOpen(false)}
+        user={user}
+        onSubscribeSuccess={(updatedUser) => {
+          setUser(updatedUser);
+          if (pendingRepairCallback) {
+            setTimeout(() => {
+              pendingRepairCallback();
+              setPendingRepairCallback(null);
+            }, 300);
+          }
+        }}
+      />
+
+      {/* 5. BENTO GRID FOOTER RAIL */}
       <footer className="border-t border-white/5 bg-[#0c0d0f] mt-12 py-6 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono text-slate-600 uppercase">
           <div className="flex flex-wrap items-center gap-4">

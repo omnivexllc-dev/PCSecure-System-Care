@@ -118,3 +118,23 @@ export interface ScanHistoryItem {
   speedBoostPercent: number;
 }
 
+export interface UserAccount {
+  email: string;
+  name: string;
+  isLoggedIn: boolean;
+  isSubscribed: boolean;
+  plan?: "MONTHLY_CARE" | "ANNUAL_PRO" | "LIFETIME_ULTIMATE";
+  subscribedAt?: string;
+}
+
+export interface SubscriptionPlan {
+  id: "MONTHLY_CARE" | "ANNUAL_PRO" | "LIFETIME_ULTIMATE";
+  name: string;
+  price: string;
+  period: string;
+  badge?: string;
+  features: string[];
+  recommended?: boolean;
+}
+
+
