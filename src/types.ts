@@ -105,3 +105,16 @@ export interface CustomScriptResult {
   safetyRating: string;
   expectedTimeSeconds: number;
 }
+
+export interface ScanHistoryItem {
+  id: string;
+  timestamp: string;
+  dateStr: string;
+  issuesFound: number;
+  issuesRepaired: number;
+  storageReclaimedGB: number;
+  systemHealthAfter: "OPTIMIZED" | "NEEDS_ATTENTION" | "CRITICAL";
+  scanType: "First-Time System Audit" | "Routine Smart Scan" | "Deep Security & Care Scan";
+  speedBoostPercent: number;
+}
+
