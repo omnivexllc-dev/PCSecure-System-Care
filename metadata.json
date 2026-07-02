@@ -1,0 +1,6 @@
+{
+  "name": "PulseWASM System Care",
+  "description": "Advanced browser-based PC diagnostic and performance optimization suite using WebAssembly and real-world system telemetry, featuring automated 1-click repairs and AI root-cause analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
